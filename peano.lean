@@ -1,4 +1,3 @@
-
 inductive NatP
 | zero: NatP
 | succ: NatP → NatP
@@ -37,16 +36,6 @@ def lt
 | succ _, zero => false
 | succ x, succ y => lt x y
 
-
-theorem succ_zero : neq (succ zero) zero := rfl
-
-theorem succ_neq : ∀ x, neq (succ x) zero := by
-  intro x
-  induction x with
-  | zero => rfl
-  | succ x ih => rfl
-
-
 theorem add_zero (x : NatP) : add x zero = x := by
   induction x with
   | zero => rfl
@@ -59,14 +48,42 @@ theorem add_succ (x y : NatP) : add x (succ y) = succ (add x y) := by
 
 theorem add_comm (x y : NatP) : add x y = add y x := by
   induction x with
-  | zero =>
-    -- show add zero y = add y zero
-    simp [add]
-    rw [add_zero]
+  | zero => simp [add, add_zero]
+  | succ x ih => simp [add, ih, add_succ y x]
+
+theorem add_assoc_zero (x y : NatP) : add x (add y zero) = add x y := by
+  induction x with
+  | zero => simp [add, add_zero]
+  | succ x ih => simp [add, ih]
+
+theorem add_assoc (x y z : NatP) : add x (add y z) = add (add x y) z := by
+  induction x with
+  | zero => simp [add]
+  | succ x' ih => simp [add, ih]
+
+theorem mull_zero (x : NatP) : mul x zero = zero := by
+  induction x with
+  | zero => rfl
+  | succ x ih => simp [mul, ih, add_zero]
+
+theorem mul_succ (x y : NatP) : mul x (succ y) = add (mul x y) x := by
+  induction x with
+  | zero => rfl
   | succ x ih =>
-    -- show add (succ x) y = add y (succ x)
-    simp [add]
-    -- show succ (add x y) = add y (succ x)
+    show add (succ y) (mul x (succ y)) = add (add y (mul x y)) (succ x)
+    rw [ih, add_succ]
+    show succ (add y (add (mul x y) x)) = succ (add (add y (mul x y)) x)
+    rw [add_assoc]
+
+theorem mul_comm (x y : NatP) : mul x y = mul y x := by
+  induction x with
+  | zero => rw [mul, mull_zero]
+  | succ x ih =>
+    show mul (succ x) y = mul y (succ x)
+    rw [mul_succ]
+    -- show mul (succ x) y = add (mul y x) y
+    rw [mul]
+    -- show add y (mul x y) = add (mul y x) y
+    rw [add_comm]
+    -- show add (mul x y) y = add (mul y x) y
     rw [ih]
-    -- show succ (add y x) = add y (succ x)
-    rw [add_succ y x]
