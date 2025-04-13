@@ -87,3 +87,41 @@ theorem mul_comm (x y : NatP) : mul x y = mul y x := by
     rw [add_comm]
     -- show add (mul x y) y = add (mul y x) y
     rw [ih]
+
+theorem mul_add (x y z : NatP) : mul x (add y z) = add (mul x y) (mul x z) := by
+  induction x with
+  | zero => rfl
+  | succ x ih =>
+    show mul (succ x) (add y z) = add (mul (succ x) y) (mul (succ x) z)
+    simp only [mul]
+    -- show add (add y z) (mul x (add y z)) = add (add y (mul x y)) (add z (mul x z))
+    rw [ih]
+    -- show add (add y z) (add (mul x y) (mul x z)) = add (add y (mul x y)) (add z (mul x z))
+    rw [add_assoc]
+    -- show add (add (add y z) (mul x y)) (mul x z) = add (add y (mul x y)) (add z (mul x z))
+    rw [<-add_assoc]
+    -- show add (add y z) (add (mul x y) (mul x z)) = add (add y (mul x y)) (add z (mul x z))
+    rw [<- add_assoc]
+    -- show add y (add z (add (mul x y) (mul x z))) = add (add y (mul x y)) (add z (mul x z))
+    rw [add_comm (mul x y)]
+    -- show add y (add z (add (mul x z) (mul x y) )) = add (add y (mul x y)) (add z (mul x z))
+    rw [add_assoc z]
+    -- show add y (add (add z (mul x z)) (mul x y)) = add (add y (mul x y)) (add z (mul x z))
+    rw [<-add_comm (mul x y)]
+    -- show add y (add (mul x y) (add z (mul x z))) = add (add y (mul x y)) (add z (mul x z))
+    rw [add_assoc y]
+
+theorem mul_assoc (x y z : NatP) : mul x (mul y z) = mul (mul x y) z := by
+  induction x with
+  | zero => rfl
+  | succ x ih =>
+    -- show mul (succ x) (mul y z) = mul (mul (succ x) y) z
+    simp [mul]
+    -- show add (mul y z) (mul x (mul y z)) = mul (add y (mul x y)) z
+    rw [ih]
+    -- show add (mul y z) (mul (mul x y) z) = mul (add y (mul x y)) z
+    rw [mul_comm y, mul_comm (mul x y)]
+    -- show add (mul z y) (mul z (mul x y)) = mul (add y (mul x y)) z
+    rw [<-mul_add z]
+    -- show mul z (add y (mul x y)) = mul (add y (mul x y)) z
+    rw [mul_comm]
