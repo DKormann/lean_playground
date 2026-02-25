@@ -9,6 +9,12 @@ def add: NatP → NatP → NatP
 | zero, y => y
 | succ x, y => succ (add x y)
 
+
+
+
+
+
+
 def one := succ zero
 def two := succ one
 
@@ -40,6 +46,7 @@ def lt
 
 theorem succ_zero : neq (succ zero) zero := rfl
 
+
 theorem succ_neq : ∀ x, neq (succ x) zero := by
   intro x
   induction x with
@@ -62,6 +69,7 @@ theorem add_x_zero: ∀ (x:NatP), add x zero = x := by
     simp [add]
     show add x zero = x
     exact ih
+
 
 
 

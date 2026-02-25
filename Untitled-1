@@ -1,0 +1,13 @@
+
+
+
+
+inductive Vec (A : Type) : Nat → Type
+| nil : Vec A 0
+| cons : A → Vec A n → Vec A (n + 1)
+
+
+
+
+def p : Vec Nat 3 := (Vec.cons 2 (Vec.cons 3 Vec.nil))
+
