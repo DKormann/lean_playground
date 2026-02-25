@@ -115,7 +115,7 @@ theorem mem_unpack (s : PSet) (e : PSet) (h : Mem e s) : ∃ i : s.idx, Equiv (s
 theorem mem_mk (s : PSet) (i : s.idx) (e : PSet) (h : Equiv (s.elm i) e) : Mem e s :=
   match s with | ⟨_,_⟩ => ⟨i, h⟩
 
-theorem union_spec (a : PSet) : (e : PSet) → Mem e (Union a) ↔ ∃k, Mem e k ∧ Mem k a :=
+theorem Union.spec (a : PSet) : (e : PSet) → Mem e (Union a) ↔ ∃k, Mem e k ∧ Mem k a :=
   fun e=>
     Iff.intro
       (
@@ -139,3 +139,17 @@ theorem union_spec (a : PSet) : (e : PSet) → Mem e (Union a) ↔ ∃k, Mem e k
         let ⟨ki, h5⟩ := mem_unpack (af ai) e h4;
         ⟨⟨ai, ki⟩, h5⟩
       )
+
+def Separation : (PSet) → (PSet → Prop) → PSet
+  | ⟨AI, af⟩, p => ⟨{ai : AI // p (af ai)}, fun ⟨ai, _⟩ => af ai⟩
+
+def Separation.spec : (a:PSet) → (p: PSet → Prop) → (e:PSet) → Mem e (Separation a p) ↔ (Mem e a) ∧ p e
+  | ⟨AI, af⟩, p => fun e =>
+    Iff.intro
+      (
+        fun  ⟨ ⟨ai,h⟩ , b ⟩=>
+        let h1 : Equiv (af ai) e := b;
+        let h2 : p (af ai) := h;
+        ⟨sorry, sorry⟩
+      )
+      sorry
