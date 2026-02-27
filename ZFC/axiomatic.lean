@@ -70,47 +70,42 @@ theorem opair_eq (a b c d : SET) : opair a b = opair c d ↔ a = c ∧ b = d :=
 
   ⟨
     fun h =>
+      let h' : pair aa ab = pair cc cd  := h;
+      let q := fun e =>
+        let t := mem_pair aa ab e
+        let t' : Mem e (pair cc cd) ↔ e = aa ∨ e = ab := Eq.substr h'.symm t;
+        let u : e = cc ∨ e = cd ↔ e = aa ∨ e = ab := (mem_pair cc cd e).symm.trans t'
+        u
 
-    let h' : pair aa ab = pair cc cd  := h;
+      let hcc := (q cc).mp (.inl rfl);
 
-    let q := fun e =>
-      let t := mem_pair aa ab e
-      let t' : Mem e (pair cc cd) ↔ e = aa ∨ e = ab := Eq.substr h'.symm t;
-      let u : e = cc ∨ e = cd ↔ e = aa ∨ e = ab := (mem_pair cc cd e).symm.trans t'
-      u
+      let a_c : a=c := match hcc with
+        | .inl h => pair_aa_bc c a h
+        | .inr h => pair_aa_bc c a h
 
-    let hcc := (q cc).mp (.inl rfl);
+      let q : (e:SET)-> (e=aa ∨ e= ad ↔ e =aa ∨ e =ab) := Eq.substr
+        (p :=(fun c=> ((e : SET)-> ( e = (pair c c) ∨ e = (pair c d) ↔ e = aa ∨ e = ab))))
+        a_c q
 
-    let a_c : a=c := match hcc with
-      | .inl h => pair_aa_bc c a h
-      | .inr h => pair_aa_bc c a h
 
-    let q : (e:SET)-> (e=aa ∨ e= ad ↔ e =aa ∨ e =ab) := Eq.substr
-      (p :=(fun c=> ((e : SET)-> ( e = (pair c c) ∨ e = (pair c d) ↔ e = aa ∨ e = ab))))
-      a_c q
 
-    let had := (q ad).mp (.inr rfl);
-    let hab := (q ab).mpr (.inr rfl)
-    let stps  :{a b c:SET} -> (pair b c)= pair a a -> (pair a a=pair c b):= fun (h) => (h.symm.trans pair.symm)
-
-    let f := fun (b_a:b=a) =>
-      match had with
-        |.inl h=>b_a.trans (pair_aa_bc a d (stps h)).symm
-        |.inr h=>
-        let l := Eq.subst (motive := fun x=>ad=pair a x) b_a h
-        b_a.trans (pair_aa_bc a d (stps l)).symm
-    ⟨
-      a_c,
-      match hab with
-      | .inl h => f (pair_aa_bc a b (h.symm.trans pair.symm))
-      | .inr h =>
-        let k:= fun (e:SET) =>
-          Eq.subst (motive:= fun x=> Mem e x ↔ e = a ∨ e = b) h (mem_pair a b e)
-        let l := (k b).mpr (.inr rfl)
-        match (mem_pair a d b).mp l  with
-        | .inl b_a => f b_a
-        | .inr h => h
-    ⟩,
+      let f := fun (b_a:b=a) =>
+        match (q ad).mp (.inr rfl) with
+          |.inl h=>b_a.trans (pair_aa_bc a d ( h.symm.trans pair.symm)).symm
+          |.inr h=>
+          b_a.trans (pair_aa_bc a d ((Eq.subst (motive := fun x=>ad=pair a x) b_a h).symm.trans pair.symm)).symm
+      ⟨
+        a_c,
+        match (q ab).mpr (.inr rfl) with
+        | .inl h => f (pair_aa_bc a b (h.symm.trans pair.symm))
+        | .inr h =>
+          let k:= fun (e:SET) =>
+            Eq.subst (motive:= fun x=> Mem e x ↔ e = a ∨ e = b) h (mem_pair a b e)
+          let l := (k b).mpr (.inr rfl)
+          match (mem_pair a d b).mp l  with
+          | .inl b_a => f b_a
+          | .inr h => h
+      ⟩,
     fun h =>
       Eq.subst (motive := fun x => opair a b = opair c x) h.right
       (Eq.subst (motive := fun x => opair a b = opair x b) h.left rfl)
